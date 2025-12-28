@@ -1,88 +1,2513 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="./static/css/styles.css" />
-        <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src * 'unsafe-inline' 'unsafe-eval'"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tauri App</title>
-        <script src="./static/js/main.js"></script>
-    </head>
-    <body>
-        <main class="container">
-            <h1>Welcome to TauriMan</h1>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTX工具在线发布中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #252526;
+            --bg-tertiary: #2d2d30;
+            --bg-panel: #0e0e0e;
+            --border-color: #3e3e42;
+            --border-light: #4f4f52;
+            --text-primary: #cccccc;
+            --text-secondary: #858585;
+            --text-highlight: #ffffff;
+            --accent-blue: #007acc;
+            --accent-green: #4ec9b0;
+            --accent-yellow: #dcdcaa;
+            --accent-purple: #c586c0;
+            --accent-orange: #ce9178;
+            --accent-red: #f14c4c;
+            --success-color: #0dbc79;
+            --warning-color: #e9a700;
+            --error-color: #f14c4c;
+            --font-monospace: 'Consolas', 'Monaco', 'Courier New', monospace;
+            --font-ui: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --sidebar-width: 250px;
+            --header-height: 60px;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            font-family: var(--font-ui);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(0, 122, 204, 0.05) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(78, 201, 176, 0.05) 0px, transparent 50%);
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-blue);
+            font-family: var(--font-monospace);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-title i {
+            font-size: 1.4rem;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-family: var(--font-monospace);
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        
+        .nav-item.active {
+            background-color: rgba(0, 122, 204, 0.15);
+            color: var(--text-highlight);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .nav-section {
+            margin-bottom: 25px;
+        }
+        
+        .nav-section-title {
+            padding: 8px 20px;
+            color: var(--accent-green);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: var(--font-monospace);
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            height: var(--header-height);
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            flex-shrink: 0;
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            color: var(--text-highlight);
+            font-family: var(--font-monospace);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            color: var(--text-highlight);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-family: var(--font-monospace);
+        }
+        
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            font-family: var(--font-monospace);
+        }
+        
+        /* 许可证验证部分样式 */
+        .license-section {
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+        
+        .license-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .license-title i {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin-right: 15px;
+        }
+        
+        .license-title h2 {
+            color: var(--text-highlight);
+            font-size: 1.6rem;
+            font-family: var(--font-monospace);
+        }
+        
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--accent-green);
+            font-family: var(--font-monospace);
+            font-size: 1rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-yellow);
+            z-index: 2;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            color: var(--text-highlight);
+            transition: all 0.3s ease;
+            background-color: var(--bg-primary);
+            font-family: var(--font-monospace);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+        }
+        
+        .submit-btn {
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: var(--font-monospace);
+            letter-spacing: 0.5px;
+        }
+        
+        .submit-btn:hover {
+            background-color: #0062a3;
+            box-shadow: 0 5px 15px rgba(0, 122, 204, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .submit-btn i {
+            font-size: 1rem;
+        }
+        
+        .hint {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(220, 220, 170, 0.1);
+            border-radius: 4px;
+            border-left: 4px solid var(--accent-yellow);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-family: var(--font-monospace);
+        }
+        
+        .hint i {
+            color: var(--accent-yellow);
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+        
+        .hint code {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--accent-orange);
+            font-family: var(--font-monospace);
+            font-weight: bold;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            font-family: var(--font-monospace);
+            border-left: 4px solid transparent;
+        }
+        
+        .success {
+            background-color: rgba(13, 188, 121, 0.1);
+            color: var(--success-color);
+            border-left-color: var(--success-color);
+        }
+        
+        .error {
+            background-color: rgba(241, 76, 76, 0.1);
+            color: var(--error-color);
+            border-left-color: var(--error-color);
+        }
+        
+        .warning {
+            background-color: rgba(233, 167, 0, 0.1);
+            color: var(--warning-color);
+            border-left-color: var(--warning-color);
+        }
+        
+        /* 文档部分样式 */
+        .documentation-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            max-width: 1400px;
+        }
+        
+        .doc-sidebar {
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .doc-nav {
+            padding: 15px 0;
+        }
+        
+        .doc-nav-item {
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-family: var(--font-monospace);
+        }
+        
+        .doc-nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        
+        .doc-nav-item.active {
+            background-color: rgba(0, 122, 204, 0.15);
+            color: var(--text-highlight);
+            border-left-color: var(--accent-blue);
+        }
+        
+        .doc-content {
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .doc-section {
+            display: none;
+            margin-bottom: 40px;
+        }
+        
+        .doc-section.active {
+            display: block;
+        }
+        
+        .doc-section-title {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-family: var(--font-monospace);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .doc-section-subtitle {
+            color: var(--accent-green);
+            font-size: 1.4rem;
+            margin: 25px 0 15px;
+            font-family: var(--font-monospace);
+        }
+        
+        .doc-text {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .code-block {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: var(--font-monospace);
+            font-size: 0.95rem;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+        
+        .code-keyword {
+            color: var(--accent-blue);
+        }
+        
+        .code-string {
+            color: var(--accent-orange);
+        }
+        
+        .code-comment {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .code-function {
+            color: var(--accent-purple);
+        }
+        
+        .code-var {
+            color: var(--accent-green);
+        }
+        
+        .code-number {
+            color: var(--accent-orange);
+        }
+        
+        .code-operator {
+            color: var(--accent-yellow);
+        }
+        
+        /* API部分样式 */
+        .api-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            max-width: 1400px;
+        }
+        
+        .api-sidebar {
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+        }
+        
+        .api-endpoint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .api-endpoint {
+            padding: 12px 15px;
+            background-color: var(--bg-secondary);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-monospace);
+        }
+        
+        .api-endpoint:hover {
+            border-color: var(--accent-blue);
+            background-color: rgba(0, 122, 204, 0.1);
+        }
+        
+        .api-endpoint.active {
+            border-color: var(--accent-blue);
+            background-color: rgba(0, 122, 204, 0.15);
+        }
+        
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .method-get {
+            background-color: rgba(78, 201, 176, 0.2);
+            color: var(--accent-green);
+        }
+        
+        .method-post {
+            background-color: rgba(0, 122, 204, 0.2);
+            color: var(--accent-blue);
+        }
+        
+        .method-put {
+            background-color: rgba(233, 167, 0, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .method-delete {
+            background-color: rgba(241, 76, 76, 0.2);
+            color: var(--error-color);
+        }
+        
+        .endpoint-path {
+            color: var(--text-primary);
+        }
+        
+        .api-detail {
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+        }
+        
+        .api-title {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-family: var(--font-monospace);
+        }
+        
+        .api-description {
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .api-request, .api-response {
+            margin-bottom: 30px;
+        }
+        
+        .api-section-title {
+            color: var(--accent-green);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-family: var(--font-monospace);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .param-table th {
+            background-color: var(--bg-secondary);
+            color: var(--text-highlight);
+            padding: 12px 15px;
+            text-align: left;
+            font-family: var(--font-monospace);
+            border: 1px solid var(--border-color);
+        }
+        
+        .param-table td {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .param-name {
+            color: var(--accent-orange);
+            font-family: var(--font-monospace);
+        }
+        
+        .param-type {
+            color: var(--accent-green);
+            font-family: var(--font-monospace);
+        }
+        
+        .param-required {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: rgba(241, 76, 76, 0.2);
+            color: var(--error-color);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        /* 设置部分样式 */
+        .settings-container {
+            max-width: 1000px;
+        }
+        
+        .settings-section {
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .settings-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .settings-title i {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin-right: 15px;
+        }
+        
+        .settings-title h2 {
+            color: var(--text-highlight);
+            font-size: 1.6rem;
+            font-family: var(--font-monospace);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-name {
+            color: var(--text-highlight);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-family: var(--font-monospace);
+        }
+        
+        .setting-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            transition: .4s;
+            border-radius: 30px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 3px;
+            background-color: var(--text-secondary);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(28px);
+            background-color: white;
+        }
+        
+        .select-wrapper {
+            position: relative;
+            width: 200px;
+        }
+        
+        .select-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        
+        /* 状态栏样式 */
+        .status-bar {
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: var(--font-monospace);
+            flex-shrink: 0;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-item i {
+            color: var(--accent-green);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: var(--font-monospace);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border-light);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0062a3;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .documentation-container,
+            .api-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .doc-sidebar,
+            .api-sidebar {
+                order: 2;
+            }
+            
+            .doc-content,
+            .api-detail {
+                order: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .nav-section {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin-bottom: 15px;
+            }
+            
+            .nav-item {
+                padding: 10px 15px;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-item.active {
+                border-left: none;
+                border-bottom-color: var(--accent-blue);
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .setting-control {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 0 15px;
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .license-section,
+            .doc-content,
+            .api-detail,
+            .settings-section {
+                padding: 20px;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏导航 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <i class="fas fa-code"></i>
+                    <span>FTX 开发中心</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <a href="#" class="nav-item active" data-section="license">
+                    <i class="fas fa-key"></i>
+                    <span>许可证验证</span>
+                </a>
+                <a href="#" class="nav-item" data-section="documentation">
+                    <i class="fas fa-book"></i>
+                    <span>文档</span>
+                </a>
+                <a href="#" class="nav-item" data-section="api">
+                    <i class="fas fa-code-branch"></i>
+                    <span>API 接口</span>
+                </a>
+                <a href="#" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>设置</span>
+                </a>
+            </div>
+            
+            <div class="nav-section" style="margin-top: auto;">
+                <div class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span id="user-status"></span>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-title" id="current-section-title">许可证验证</div>
+                <div class="header-actions">
+                    <div class="status-item">
+                        <i class="fas fa-circle"></i>
+                        <span id="connection-status">权限检测</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <!-- 许可证验证部分 -->
+                <div class="content-section active" id="license-section">
+                    <h1 class="section-title">许可证验证</h1>
+                    <p class="section-subtitle">请输入您的许可证代码以访问FTX工具。如果您还没有许可证，请联系我们的团队获取。</p>
+                    
+                    <div class="license-section">
+                        <div class="license-title">
+                            <i class="fas fa-key"></i>
+                            <h2>许可证验证</h2>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="license-code">许可证代码</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-code"></i>
+                                <input type="text" id="license-code" placeholder="输入您的许可证代码" autocomplete="off" value="######">
+                            </div>
+                        </div>
+                        
+                        <div class="code-block">
+                            <span class="code-comment">// 许可证验证示例代码</span><br>
+                            <span class="code-keyword">const</span> <span class="code-var">licenseCode</span> = <span class="code-string">"######"</span>;<br>
+                            <span class="code-keyword">function</span> <span class="code-function">validateLicense</span>(<span class="code-var">code</span>) {<br>
+                            &nbsp;&nbsp;<span class="code-keyword">if</span> (<span class="code-var">code</span> <span class="code-operator">===</span> <span class="code-var">licenseCode</span>) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-keyword">true</span>;<br>
+                            &nbsp;&nbsp;}<br>
+                            &nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-keyword">false</span>;<br>
+                            }
+                        </div>
+                        
+                        <button id="submit-btn" class="submit-btn">
+                            <span class="btn-text">验证许可证</span>
+                            <div class="spinner" id="spinner"></div>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                        
+                        <div id="message" class="message"></div>
+                        
+                        <div class="hint">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <strong>提示：</strong> 输入正确的正确的许可证代码后，您将被重定向到工具页面。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 文档部分 -->
+                <div class="content-section" id="documentation-section">
+                    <h1 class="section-title">文档中心</h1>
+                    <p class="section-subtitle">FTX工具完整技术文档和使用指南</p>
+                    
+                    <div class="documentation-container">
+                        <div class="doc-sidebar">
+                            <div class="doc-nav">
+                                <a href="#" class="doc-nav-item active" data-doc="getting-started">入门指南</a>
+                                <a href="#" class="doc-nav-item" data-doc="installation">安装与配置</a>
+                                <a href="#" class="doc-nav-item" data-doc="usage">使用教程</a>
+                                <a href="#" class="doc-nav-item" data-doc="advanced">高级功能</a>
+                                <a href="#" class="doc-nav-item" data-doc="troubleshooting">故障排除</a>
+                                <a href="#" class="doc-nav-item" data-doc="faq">常见问题</a>
+                            </div>
+                        </div>
+                        
+                        <div class="doc-content">
+                            <div class="doc-section active" id="getting-started">
+                                <h2 class="doc-section-title">入门指南</h2>
+                                <p class="doc-text">欢迎使用FTX工具套件。本指南将帮助您快速开始使用我们的工具。</p>
+                                
+                                <h3 class="doc-section-subtitle">系统要求（全部）</h3>
+                                <p class="doc-text">在开始之前，请确保您的系统满足以下要求：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// 最低系统要求</span><br>
+                                    <span class="code-keyword">操作系统</span>: Windows 7+ / macOS 10.14+ / Linux (Ubuntu 18.04+)<br>
+                                    <span class="code-keyword">内存</span>: 4 GB RAM (推荐 16 GB)<br>
+                                    <span class="code-keyword">存储空间</span>: 1 GB 可用空间<br>
+                                    <span class="code-keyword">网络</span>: 稳定的互联网连接<br>
+                                    <span class="code-keyword">权限</span>: 管理员/root权限（用于安装）/无视风险安装权限
+                                </div>
+                                
+                                <h3 class="doc-section-subtitle">许可证激活</h3>
+                                <p class="doc-text">要激活FTX工具，您需要有效的许可证代码。您可以通过以下方式获取：</p>
+                                <ol style="color: var(--text-primary); margin-left: 20px; margin-bottom: 20px;">
+                                    <li>从官方获取公开许可证</li>
+                                    <li>联系团队获取试用许可证</li>
+                                    <li>参与我们的开发者计划获取免费许可证</li>
+                                </ol>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// 激活流程示例</span><br>
+                                    <span class="code-number">1</span>. 打开FTX工具启动器<br>
+                                    <span class="code-number">2</span>. 点击"许可证验证"按钮<br>
+                                    <span class="code-number">3</span>. 输入您的许可证代码<br>
+                                    <span class="code-number">4</span>. 点击"激活"按钮<br>
+                                    <span class="code-number">5</span>. 等待验证完成
+                                </div>
+                            </div>
+                            
+                            <div class="doc-section" id="installation">
+                                <h2 class="doc-section-title">安装与配置（适配中）</h2>
+                                <p class="doc-text">本节将指导您完成FTX工具的安装和初始配置过程。</p>
+                                
+                                <h3 class="doc-section-subtitle">Windows安装</h3>
+                                <p class="doc-text">对于Windows用户，请按照以下步骤安装：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment"># 1. 下载安装程序</span><br>
+                                    <span class="code-keyword">Invoke-WebRequest</span> -Uri <span class="code-string">"https://github.com/ProgrammerLiSichen/FTX_Tools"</span> -OutFile <span class="code-string">"ftx-installer.exe"</span><br><br>
+                                    
+                                    <span class="code-comment"># 2. 运行安装程序（需要管理员权限）</span><br>
+                                    <span class="code-keyword">Start-Process</span> -FilePath <span class="code-string">"ftx-installer.exe"</span> -Verb RunAs<br><br>
+                                    
+                                    <span class="code-comment"># 3. 按照安装向导完成安装</span><br>
+                                    <span class="code-comment"># 4. 启动FTX工具</span><br>
+                                    <span class="code-keyword">Start-Process</span> -FilePath <span class="code-string">"C:\Program Files\FTX Tools\ftx-launcher.exe"</span>
+                                </div>
+                                
+                                <h3 class="doc-section-subtitle">配置文件（适配中）</h3>
+                                <p class="doc-text">安装完成后，您可以在以下位置找到配置文件：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// Windows 配置文件路径</span><br>
+                                    <span class="code-string">%APPDATA%\FTX Tools\config.json</span><br><br>
+                                    
+                                    <span class="code-comment">// macOS / Linux 配置文件路径</span><br>
+                                    <span class="code-string">~/.config/ftx-tools/config.json</span><br><br>
+                                    
+                                    <span class="code-comment">// 配置文件示例</span><br>
+                                    {<br>
+                                    &nbsp;&nbsp;<span class="code-string">"license_key"</span>: <span class="code-string">"YOUR_LICENSE_KEY"</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">"auto_update"</span>: <span class="code-keyword">true</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">"theme"</span>: <span class="code-string">"dark"</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">"log_level"</span>: <span class="code-string">"info"</span>,<br>
+                                    }
+                                </div>
+                            </div>
+                            
+                            <div class="doc-section" id="usage">
+                                <h2 class="doc-section-title">使用教程</h2>
+                                <p class="doc-text">了解如何使用FTX工具的核心功能。</p>
+                                
+                                <h3 class="doc-section-subtitle">基本操作</h3>
+                                <p class="doc-text">FTX工具提供了直观的用户界面，主要功能包括：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// 主要功能模块</span><br>
+                                    <span class="code-number">1</span>. <span class="code-keyword">数据分析</span> - 导入和分析数据文件<br>
+                                    <span class="code-number">2</span>. <span class="code-keyword">报告生成</span> - 创建自定义报告<br>
+                                    <span class="code-number">3</span>. <span class="code-keyword">自动化任务</span> - 设置自动化工作流程<br>
+                                    <span class="code-number">4</span>. <span class="code-keyword">导出功能</span> - 导出结果到多种格式<br>
+                                    <span class="code-number">5</span>. <span class="code-keyword">监控面板</span> - 实时监控系统状态
+                                </div>
+                                
+                                <h3 class="doc-section-subtitle">命令行界面（适配中）</h3>
+                                <p class="doc-text">除了图形界面，FTX工具还提供了强大的命令行接口：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment"># 查看所有可用命令</span><br>
+                                    <span class="code-keyword">ftx</span> --help<br><br>
+                                    
+                                    <span class="code-comment"># 运行数据分析</span><br>
+                                    <span class="code-keyword">ftx</span> analyze --input data.csv --output results.json<br><br>
+                                    
+                                    <span class="code-comment"># 生成报告</span><br>
+                                    <span class="code-keyword">ftx</span> report --type pdf --template standard<br><br>
+                                    
+                                    <span class="code-comment"># 检查许可证状态</span><br>
+                                    <span class="code-keyword">ftx</span> license --status<br><br>
+                                    
+                                    <span class="code-comment"># 更新工具</span><br>
+                                    <span class="code-keyword">ftx</span> update --channel stable
+                                </div>
+                            </div>
+                            
+                            <div class="doc-section" id="advanced">
+                                <h2 class="doc-section-title">高级功能（适配中）</h2>
+                                <p class="doc-text">了解FTX工具的高级功能和自定义选项。</p>
+                                
+                                <h3 class="doc-section-subtitle">自定义插件（适配中）</h3>
+                                <p class="doc-text">FTX工具支持通过插件扩展功能。您可以创建自定义插件来满足特定需求：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// 插件基本结构示例</span><br>
+                                    <span class="code-keyword">const</span> <span class="code-var">ftxPlugin</span> = {<br>
+                                    &nbsp;&nbsp;<span class="code-string">name</span>: <span class="code-string">"My Custom Plugin"</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">version</span>: <span class="code-string">"1.0.0"</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">author</span>: <span class="code-string">"Your Name"</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">init</span>: <span class="code-keyword">function</span>(<span class="code-var">api</span>) {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">// 初始化插件</span><br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-var">console</span>.<span class="code-function">log</span>(<span class="code-string">"插件已加载"</span>);<br>
+                                    &nbsp;&nbsp;},<br>
+                                    &nbsp;&nbsp;<span class="code-string">commands</span>: {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"my-command"</span>: <span class="code-keyword">function</span>(<span class="code-var">args</span>) {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">// 自定义命令实现</span><br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">"命令执行完成"</span>;<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                    &nbsp;&nbsp;}<br>
+                                    };<br><br>
+                                    
+                                    <span class="code-comment">// 注册插件</span><br>
+                                    <span class="code-var">ftx</span>.<span class="code-function">registerPlugin</span>(<span class="code-var">ftxPlugin</span>);
+                                </div>
+                                
+                                <h3 class="doc-section-subtitle">API集成（适配中）</h3>
+                                <p class="doc-text">FTX工具提供了完整的API接口，可以与其他系统集成：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// 通过API调用FTX工具功能</span><br>
+                                    <span class="code-keyword">const</span> <span class="code-var">response</span> = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">"https://github.com/ProgrammerLiSichen/FTX_Tools"</span>, {<br>
+                                    &nbsp;&nbsp;<span class="code-string">method</span>: <span class="code-string">"POST"</span>,<br>
+                                    &nbsp;&nbsp;<span class="code-string">headers</span>: {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Content-Type"</span>: <span class="code-string">"application/json"</span>,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Authorization"</span>: <span class="code-string">"Bearer YOUR_API_KEY"</span><br>
+                                    &nbsp;&nbsp;},<br>
+                                    &nbsp;&nbsp;<span class="code-string">body</span>: <span class="code-keyword">JSON</span>.<span class="code-function">stringify</span>({<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"data"</span>: <span class="code-string">"your-data-here"</span>,<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"options"</span>: {<br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"format"</span>: <span class="code-string">"json"</span><br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                    &nbsp;&nbsp;})<br>
+                                    });<br><br>
+                                    
+                                    <span class="code-comment">// 处理响应</span><br>
+                                    <span class="code-keyword">const</span> <span class="code-var">result</span> = <span class="code-keyword">await</span> <span class="code-var">response</span>.<span class="code-function">json</span>();<br>
+                                    <span class="code-var">console</span>.<span class="code-function">log</span>(<span class="code-var">result</span>);
+                                </div>
+                            </div>
+                            
+                            <div class="doc-section" id="troubleshooting">
+                                <h2 class="doc-section-title">故障排除</h2>
+                                <p class="doc-text">常见问题及其解决方法。</p>
+                                
+                                <h3 class="doc-section-subtitle">常见问题</h3>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// 问题1: 许可证验证失败</span><br>
+                                    <span class="code-string">原因</span>: 许可证代码错误或过期<br>
+                                    <span class="code-string">解决方案</span>:<br>
+                                    &nbsp;&nbsp;1. 检查许可证代码是否正确<br>
+                                    &nbsp;&nbsp;2. 确认许可证是否在有效期内<br>
+                                    &nbsp;&nbsp;3. 联系支持团队获取帮助<br><br>
+                                    
+                                    <span class="code-comment">// 问题2: 工具启动缓慢</span><br>
+                                    <span class="code-string">原因</span>: 系统资源不足或配置文件过大<br>
+                                    <span class="code-string">解决方案</span>:<br>
+                                    &nbsp;&nbsp;1. 关闭不必要的应用程序<br>
+                                    &nbsp;&nbsp;2. 清理临时文件<br>
+                                    &nbsp;&nbsp;3. 重置配置文件<br><br>
+                                    
+                                    <span class="code-comment">// 问题3: 更新失败</span><br>
+                                    <span class="code-string">原因</span>: 网络问题或权限不足<br>
+                                    <span class="code-string">解决方案</span>:<br>
+                                    &nbsp;&nbsp;1. 检查网络连接<br>
+                                    &nbsp;&nbsp;2. 以管理员身份运行工具<br>
+                                    &nbsp;&nbsp;3. 手动下载更新包
+                                </div>
+                                
+                                <h3 class="doc-section-subtitle">日志文件</h3>
+                                <p class="doc-text">如果遇到问题，请检查日志文件以获取更多信息：</p>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment"># Windows 日志路径</span><br>
+                                    <span class="code-string">%APPDATA%\FTX Tools\logs\ftx.log</span><br><br>
+                                    
+                                    <span class="code-comment"># macOS / Linux 日志路径</span><br>
+                                    <span class="code-string">~/.local/share/ftx-tools/logs/ftx.log</span><br><br>
+                                    
+                                    <span class="code-comment"># 查看最近日志</span><br>
+                                    <span class="code-keyword">tail</span> -f ~/.local/share/ftx-tools/logs/ftx.log<br><br>
+                                    
+                                    <span class="code-comment"># 清除日志文件</span><br>
+                                    <span class="code-keyword">ftx</span> logs --clear
+                                </div>
+                            </div>
+                            
+                            <div class="doc-section" id="faq">
+                                <h2 class="doc-section-title">常见问题</h2>
+                                
+                                <div class="code-block">
+                                    <span class="code-comment">// Q: FTX工具支持哪些操作系统？</span><br>
+                                    <span class="code-string">A</span>: FTX工具支持Windows 7及以上版本，macOS 10.14及以上版本，以及主流Linux发行版（Ubuntu, Fedora, CentOS等）。<br><br>
+                                    
+                                    <span class="code-comment">// Q: 许可证是否可以多设备使用？</span><br>
+                                    <span class="code-string">A</span>: 标准许可证支持在多台设备上激活。<br><br>
+                                    
+                                    <span class="code-comment">// Q: 如何获取技术支持？</span><br>
+                                    <span class="code-string">A</span>: 您可以通过以下方式获取技术支持：<br>
+                                    &nbsp;&nbsp;1. 查看在线文档和FAQ<br>
+                                    &nbsp;&nbsp;2. 访问社区论坛<br>
+                                    &nbsp;&nbsp;3. 发送邮件至programmer_listchen@outlook.com<br>
+                                    &nbsp;&nbsp;4. 联系客户经理<br><br>
+                                    
+                                    <span class="code-comment">// Q: 数据安全性如何保障？</span><br>
+                                    <span class="code-string">A</span>: FTX工具采用端到端加密，所有敏感数据处理都在本地完成，除非您明确授权，否则不会上传任何数据到云端。<br><br>
+                                    
+                                    <span class="code-comment">// Q: 是否提供免费试用？</span><br>
+                                    <span class="code-string">A</span>: 是的，我们提供免费试用，包含所有核心功能。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- API接口部分 -->
+                <div class="content-section" id="api-section">
+                    <h1 class="section-title">API 接口（开发中）</h1>
+                    <p class="section-subtitle">FTX工具完整的API文档和接口说明</p>
+                    
+                    <div class="api-container">
+                        <div class="api-sidebar">
+                            <div class="api-endpoint-list">
+                                <div class="api-endpoint active" data-api="auth">
+                                    <span class="endpoint-method method-post">POST</span>
+                                    <span class="endpoint-path">/auth/login</span>
+                                </div>
+                                <div class="api-endpoint" data-api="license-verify">
+                                    <span class="endpoint-method method-post">POST</span>
+                                    <span class="endpoint-path">/license/verify</span>
+                                </div>
+                                <div class="api-endpoint" data-api="analyze">
+                                    <span class="endpoint-method method-post">POST</span>
+                                    <span class="endpoint-path">/analyze</span>
+                                </div>
+                                <div class="api-endpoint" data-api="report">
+                                    <span class="endpoint-method method-post">POST</span>
+                                    <span class="endpoint-path">/report/generate</span>
+                                </div>
+                                <div class="api-endpoint" data-api="status">
+                                    <span class="endpoint-method method-get">GET</span>
+                                    <span class="endpoint-path">/system/status</span>
+                                </div>
+                                <div class="api-endpoint" data-api="update">
+                                    <span class="endpoint-method method-get">GET</span>
+                                    <span class="endpoint-path">/update/check</span>
+                                </div>
+                                <div class="api-endpoint" data-api="users">
+                                    <span class="endpoint-method method-get">GET</span>
+                                    <span class="endpoint-path">/users</span>
+                                </div>
+                                <div class="api-endpoint" data-api="user-detail">
+                                    <span class="endpoint-method method-get">GET</span>
+                                    <span class="endpoint-path">/users/{id}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="api-detail">
+                            <div class="api-detail-section active" id="auth-api">
+                                <h2 class="api-title">认证接口</h2>
+                                <p class="api-description">用户登录和身份验证接口。使用此接口获取访问令牌，用于其他API调用。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <table class="param-table">
+                                        <thead>
+                                            <tr>
+                                                <th>参数</th>
+                                                <th>类型</th>
+                                                <th>必填</th>
+                                                <th>描述</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">username</span></td>
+                                                <td><span class="param-type">string</span></td>
+                                                <td><span class="param-required">是</span></td>
+                                                <td>用户名或邮箱地址</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">password</span></td>
+                                                <td><span class="param-type">string</span></td>
+                                                <td><span class="param-required">是</span></td>
+                                                <td>用户密码</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">remember</span></td>
+                                                <td><span class="param-type">boolean</span></td>
+                                                <td>否</td>
+                                                <td>是否记住登录状态</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">POST</span> <span class="code-string">/auth/login</span><br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"username"</span>: <span class="code-string">"user@example.com"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"password"</span>: <span class="code-string">"your-password"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"remember"</span>: <span class="code-keyword">true</span><br>
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"success"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"token"</span>: <span class="code-string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"expires_in"</span>: <span class="code-number">3600</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"user"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"id"</span>: <span class="code-number">123</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"username"</span>: <span class="code-string">"user@example.com"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"role"</span>: <span class="code-string">"admin"</span><br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 错误响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">401</span> Unauthorized<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"success"</span>: <span class="code-keyword">false</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"error"</span>: <span class="code-string">"Invalid credentials"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"code"</span>: <span class="code-number">401</span><br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="license-verify-api">
+                                <h2 class="api-title">许可证验证接口</h2>
+                                <p class="api-description">验证许可证代码的有效性。此接口用于检查许可证是否有效以及获取许可证详情。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <table class="param-table">
+                                        <thead>
+                                            <tr>
+                                                <th>参数</th>
+                                                <th>类型</th>
+                                                <th>必填</th>
+                                                <th>描述</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="param-name">license_key</span></td>
+                                                <td><span class="param-type">string</span></td>
+                                                <td><span class="param-required">是</span></td>
+                                                <td>许可证代码</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="param-name">device_id</span></td>
+                                                <td><span class="param-type">string</span></td>
+                                                <td>否</td>
+                                                <td>设备标识符</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">POST</span> <span class="code-string">/license/verify</span><br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"license_key"</span>: <span class="code-string">"######"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"device_id"</span>: <span class="code-string">"device-12345"</span><br>
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"valid"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"license"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"key"</span>: <span class="code-string">"######"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"type"</span>: <span class="code-string">"professional"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"expires_at"</span>: <span class="code-string">"2024-12-31T23:59:59Z"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"max_devices"</span>: <span class="code-number">5</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"features"</span>: [<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"advanced_analytics"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"automated_reports"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"api_access"</span><br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;]<br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="analyze-api">
+                                <h2 class="api-title">数据分析接口</h2>
+                                <p class="api-description">执行数据分析任务。此接口接受数据输入并返回分析结果。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">POST</span> <span class="code-string">/analyze</span><br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"data"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"columns"</span>: [<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"timestamp"</span>, <span class="code-string">"value"</span>, <span class="code-string">"category"</span><br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;],<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"rows"</span>: [<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="code-string">"2023-01-01"</span>, <span class="code-number">100</span>, <span class="code-string">"A"</span>],<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="code-string">"2023-01-02"</span>, <span class="code-number">150</span>, <span class="code-string">"B"</span>],<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="code-string">"2023-01-03"</span>, <span class="code-number">200</span>, <span class="code-string">"A"</span>]<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;]<br>
+                                        &nbsp;&nbsp;},<br>
+                                        &nbsp;&nbsp;<span class="code-string">"analysis_type"</span>: <span class="code-string">"trend"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"options"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"format"</span>: <span class="code-string">"json"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"detailed"</span>: <span class="code-keyword">true</span><br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"success"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"analysis_id"</span>: <span class="code-string">"anal_123456789"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"results"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"summary"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"total_records"</span>: <span class="code-number">3</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"average_value"</span>: <span class="code-number">150</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"trend"</span>: <span class="code-string">"increasing"</span><br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"details"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">// 详细分析结果</span><br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                                        &nbsp;&nbsp;},<br>
+                                        &nbsp;&nbsp;<span class="code-string">"processing_time"</span>: <span class="code-number">0.45</span><br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="report-api">
+                                <h2 class="api-title">报告生成接口</h2>
+                                <p class="api-description">根据分析结果生成报告。支持多种报告格式和模板。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">POST</span> <span class="code-string">/report/generate</span><br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"analysis_id"</span>: <span class="code-string">"anal_123456789"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"report_type"</span>: <span class="code-string">"pdf"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"template"</span>: <span class="code-string">"standard"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"options"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"include_charts"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"include_summary"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"language"</span>: <span class="code-string">"zh-CN"</span><br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"success"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"report_id"</span>: <span class="code-string">"rep_987654321"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"download_url"</span>: <span class="code-string">"https://github.com/ProgrammerLiSichen/FTX_Tools"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"file_size"</span>: <span class="code-number">2048576</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"generated_at"</span>: <span class="code-string">"2023-06-15T10:30:00Z"</span><br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="status-api">
+                                <h2 class="api-title">系统状态接口</h2>
+                                <p class="api-description">获取FTX工具系统的当前状态和运行信息。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">GET</span> <span class="code-string">/system/status</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"status"</span>: <span class="code-string">"operational"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"version"</span>: <span class="code-string">"2.1.4"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"uptime"</span>: <span class="code-number">86400</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"services"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"api"</span>: <span class="code-string">"online"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"database"</span>: <span class="code-string">"online"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"cache"</span>: <span class="code-string">"online"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"license"</span>: <span class="code-string">"online"</span><br>
+                                        &nbsp;&nbsp;},<br>
+                                        &nbsp;&nbsp;<span class="code-string">"metrics"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"active_users"</span>: <span class="code-number">142</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"requests_24h"</span>: <span class="code-number">12456</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"avg_response_time"</span>: <span class="code-number">0.12</span><br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="update-api">
+                                <h2 class="api-title">更新检查接口</h2>
+                                <p class="api-description">检查FTX工具是否有可用更新。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">GET</span> <span class="code-string">/update/check?current_version=2.1.3</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"update_available"</span>: <span class="code-keyword">true</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"latest_version"</span>: <span class="code-string">"2.1.4"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"release_notes"</span>: <span class="code-string">"Bug fixes and performance improvements"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"download_url"</span>: <span class="code-string">"https://github.com/ProgrammerLiSichen/FTX_Tools"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"release_date"</span>: <span class="code-string">"2025-10-23"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"size"</span>: <span class="code-number">15674328</span><br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="users-api">
+                                <h2 class="api-title">用户列表接口</h2>
+                                <p class="api-description">获取用户列表（仅管理员可用）。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">GET</span> <span class="code-string">/users?page=1&limit=20</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"users"</span>: [<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;{<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"id"</span>: <span class="code-number">1</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"username"</span>: <span class="code-string">"admin"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"email"</span>: <span class="code-string">"admin@example.com"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"role"</span>: <span class="code-string">"admin"</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"created_at"</span>: <span class="code-string">"2023-01-01T00:00:00Z"</span><br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment">// 更多用户...</span><br>
+                                        &nbsp;&nbsp;],<br>
+                                        &nbsp;&nbsp;<span class="code-string">"pagination"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"total"</span>: <span class="code-number">150</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"page"</span>: <span class="code-number">1</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"limit"</span>: <span class="code-number">20</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"pages"</span>: <span class="code-number">8</span><br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="api-detail-section" id="user-detail-api">
+                                <h2 class="api-title">用户详情接口</h2>
+                                <p class="api-description">获取指定用户的详细信息（仅管理员可用）。</p>
+                                
+                                <div class="api-request">
+                                    <h3 class="api-section-title">请求</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 请求示例</span><br>
+                                        <span class="code-keyword">GET</span> <span class="code-string">/users/123</span><br>
+                                        <span class="code-keyword">Authorization</span>: <span class="code-string">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="api-response">
+                                    <h3 class="api-section-title">响应</h3>
+                                    
+                                    <div class="code-block">
+                                        <span class="code-comment">// 成功响应示例</span><br>
+                                        <span class="code-keyword">HTTP/1.1</span> <span class="code-number">200</span> OK<br>
+                                        <span class="code-keyword">Content-Type</span>: <span class="code-string">application/json</span><br><br>
+                                        
+                                        {<br>
+                                        &nbsp;&nbsp;<span class="code-string">"id"</span>: <span class="code-number">123</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"username"</span>: <span class="code-string">"johndoe"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"email"</span>: <span class="code-string">"johndoe@example.com"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"role"</span>: <span class="code-string">"user"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"license_key"</span>: <span class="code-string">"######"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"created_at"</span>: <span class="code-string">"2023-03-15T10:30:00Z"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"last_login"</span>: <span class="code-string">"2023-06-14T15:45:00Z"</span>,<br>
+                                        &nbsp;&nbsp;<span class="code-string">"activity"</span>: {<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"total_analyses"</span>: <span class="code-number">42</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"total_reports"</span>: <span class="code-number">18</span>,<br>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"last_activity"</span>: <span class="code-string">"2023-06-14T15:30:00Z"</span><br>
+                                        &nbsp;&nbsp;}<br>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 设置部分 -->
+                <div class="content-section" id="settings-section">
+                    <h1 class="section-title">设置</h1>
+                    <p class="section-subtitle">配置FTX工具的各项参数和偏好设置</p>
+                    
+                    <div class="settings-container">
+                        <div class="settings-section">
+                            <div class="settings-title">
+                                <i class="fas fa-user-cog"></i>
+                                <h2>账户设置</h2>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">用户名</div>
+                                    <div class="setting-description">您的显示名称，将在系统中显示</div>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="text" id="username" value="FTX_User" style="width: 250px; padding-left: 15px;">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">电子邮件</div>
+                                    <div class="setting-description">用于接收通知和重置密码</div>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="email" id="email" value="user@example.com" style="width: 250px; padding-left: 15px;">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">许可证代码</div>
+                                    <div class="setting-description">当前激活的许可证代码</div>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="text" id="license-display" value="######" readonly style="width: 250px; padding-left: 15px; background-color: var(--bg-secondary);">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">许可证有效期</div>
+                                    <div class="setting-description">您的许可证到期时间</div>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="text" id="license-expiry" value="2030-12-31" readonly style="width: 250px; padding-left: 15px; background-color: var(--bg-secondary);">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-title">
+                                <i class="fas fa-palette"></i>
+                                <h2>界面设置</h2>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">主题（开发中）</div>
+                                    <div class="setting-description">选择界面主题风格</div>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="select-wrapper">
+                                        <select id="theme-select" style="padding-left: 15px;">
+                                            <option value="dark">深色主题</option>
+                                            <option value="light">浅色主题</option>
+                                            <option value="blue">蓝色主题</option>
+                                            <option value="high-contrast">高对比度</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">编辑器字体（开发中）</div>
+                                    <div class="setting-description">代码编辑器的字体设置</div>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="select-wrapper">
+                                        <select id="font-select" style="padding-left: 15px;">
+                                            <option value="Consolas">Consolas</option>
+                                            <option value="Monaco">Monaco</option>
+                                            <option value="Courier New">Courier New</option>
+                                            <option value="Fira Code">Fira Code</option>
+                                            <option value="JetBrains Mono">JetBrains Mono</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">字体大小（开发中）</div>
+                                    <div class="setting-description">调整界面字体大小</div>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="select-wrapper">
+                                        <select id="font-size" style="padding-left: 15px;">
+                                            <option value="12">12px</option>
+                                            <option value="13">13px</option>
+                                            <option value="14" selected>14px</option>
+                                            <option value="15">15px</option>
+                                            <option value="16">16px</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">行高（开发中）</div>
+                                    <div class="setting-description">代码编辑器的行高设置</div>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="select-wrapper">
+                                        <select id="line-height" style="padding-left: 15px;">
+                                            <option value="1.2">紧凑 (1.2)</option>
+                                            <option value="1.4">中等 (1.4)</option>
+                                            <option value="1.6" selected>宽松 (1.6)</option>
+                                            <option value="1.8">非常宽松 (1.8)</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-title">
+                                <i class="fas fa-cogs"></i>
+                                <h2>功能设置</h2>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">自动保存（开发中）</div>
+                                    <div class="setting-description">自动保存文档更改</div>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="auto-save" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">自动更新（开发中）</div>
+                                    <div class="setting-description">自动检查并安装更新</div>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="auto-update" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">错误报告（开发中）</div>
+                                    <div class="setting-description">自动发送错误报告以帮助改进产品</div>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="error-reporting" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">使用情况统计（开发中）</div>
+                                    <div class="setting-description">匿名发送使用情况统计以改进产品</div>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="usage-stats" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <div class="settings-title">
+                                <i class="fas fa-network-wired"></i>
+                                <h2>网络设置</h2>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">API 端点（开发中）</div>
+                                    <div class="setting-description">FTX工具API服务器地址</div>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="text" id="api-endpoint" value=":https://github.com/ProgrammerLiSichen/FTX_Tools" style="width: 300px; padding-left: 15px;">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">代理服务器（开发中）</div>
+                                    <div class="setting-description">通过代理服务器连接（如果需要）</div>
+                                </div>
+                                <div class="setting-control">
+                                    <input type="text" id="proxy-server" placeholder="例如: http://proxy.example.com:8080" style="width: 300px; padding-left: 15px;">
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">连接超时（开发中）</div>
+                                    <div class="setting-description">网络请求超时时间（秒）</div>
+                                </div>
+                                <div class="setting-control">
+                                    <div class="select-wrapper">
+                                        <select id="timeout" style="padding-left: 15px;">
+                                            <option value="10">10秒</option>
+                                            <option value="30" selected>30秒</option>
+                                            <option value="60">60秒</option>
+                                            <option value="120">120秒</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-name">离线模式</div>
+                                    <div class="setting-description">在没有网络连接的情况下工作</div>
+                                </div>
+                                <div class="setting-control">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="offline-mode">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button id="save-settings" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                保存
+                            </button>
+                            <button id="reset-settings" class="btn">
+                                <i class="fas fa-undo"></i>
+                                重置
+                            </button>
+                            <button id="export-settings" class="btn">
+                                <i class="fas fa-download"></i>
+                                导出
+                            </button>
+                            <button id="import-settings" class="btn">
+                                <i class="fas fa-upload"></i>
+                                导入
+                            </button>
+                        </div>
+                        
+                        <div id="settings-message" class="message" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-bar">
+                <div class="status-item">
+                    <i class="fas fa-code"></i>
+                    <span>FTX工具 版本 1.0.2</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-key"></i>
+                    <span>许可证状态: <span id="license-status">验证中</span></span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-database"></i>
+                    <span>存储: <span id="storage-status">正常</span></span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-signal"></i>
+                    <span>连接: <span id="connection-status">已连接</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <div class="row">
-                <a
-                    href="https://tauri.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <img
-                        src="./assets/tauri.svg"
-                        class="logo tauri"
-                        alt="Tauri logo"
-                    />
-                </a>
-                <a
-                    href="https://pakeplus.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <img
-                        src="https://hk.gh-proxy.org/https://github.com/Sjj1024/PakePlus/blob/main/app-icon.png"
-                        class="logo vanilla"
-                        alt="JavaScript logo"
-                    />
-                </a>
-            </div>
-            <p>Click to get data</p>
-            <form class="row" id="greet-form">
-                <input id="greet-input" placeholder="Enter a name..." />
-                <button type="submit" id="getdata">GET DATA</button>
-            </form>
-            <div class="functions">
-                <a href="./book.html" target="_self">跳转到book.html</a>
-                <a
-                    href="https://www.baidu.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    >跳到百度blank
-                </a>
-                <a
-                    href="https://www.baidu.com"
-                    target="_self"
-                    rel="noopener noreferrer"
-                >
-                    跳到百度self
-                </a>
-                <button onclick="sayHello()">点击我</button>
-                <button onclick="sayHello()">下载文件</button>
-                <button onclick="sayHello()">上传文件</button>
-                <button onclick="sayHello()">访问相机</button>
-                <button onclick="sayHello()">访问麦克风</button>
-                <button onclick="sayHello()">访问相册</button>
-                <button class="btn" onclick="openWechat()">打开微信</button>
-                <button class="btn" onclick="openWechatScan()">
-                    打开扫一扫
-                </button>
-                <button class="btn" onclick="openZhihu()">打开知乎</button>
-                <button onclick="sayHello()">打开抖音</button>
-                <button onclick="sayHello()">用浏览器打开</button>
-                <button>打开知乎</button>
-            </div>
-            <p id="greet-msg"></p>
-            <img src="./static/image/cursor.jpeg" alt="logo" />
-            <video
-                src="https://hk.gh-proxy.org/https://github.com/Sjj1024/PakePlus/blob/main/docs/static/videos/pakeplus.mp4"
-                autoplay
-                controls
-                style="width: 100%; height: 100%"
-            ></video>
-            <audio src="./static/music/yin.mp3" controls></audio>
-        </main>
-    </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化...');
+            
+            // 全局变量
+            const licenseInput = document.getElementById('license-code');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.querySelector('.btn-text');
+            const spinner = document.getElementById('spinner');
+            const messageDiv = document.getElementById('message');
+            const currentSectionTitle = document.getElementById('current-section-title');
+            const licenseStatus = document.getElementById('license-status');
+            const storageStatus = document.getElementById('storage-status');
+            const connectionStatus = document.getElementById('connection-status');
+            const userStatus = document.getElementById('user-status');
+            
+            // 导航切换
+            const navItems = document.querySelectorAll('.nav-item');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            // 文档页面导航
+            const docNavItems = document.querySelectorAll('.doc-nav-item');
+            const docSections = document.querySelectorAll('.doc-section');
+            
+            // API端点导航
+            const apiEndpoints = document.querySelectorAll('.api-endpoint');
+            const apiDetailSections = document.querySelectorAll('.api-detail-section');
+            
+            // 设置页面元素
+            const saveSettingsBtn = document.getElementById('save-settings');
+            const resetSettingsBtn = document.getElementById('reset-settings');
+            const exportSettingsBtn = document.getElementById('export-settings');
+            const importSettingsBtn = document.getElementById('import-settings');
+            const settingsMessage = document.getElementById('settings-message');
+            
+            // 初始化
+            initApp();
+            
+            function initApp() {
+                console.log('初始化应用程序...');
+                
+                // 从本地存储加载数据
+                loadUserData();
+                
+                // 设置导航事件
+                setupNavigation();
+                
+                // 设置文档页面导航
+                setupDocumentation();
+                
+                // 设置API页面导航
+                setupApiNavigation();
+                
+                // 设置设置页面功能
+                setupSettings();
+                
+                // 设置许可证验证
+                setupLicenseValidation();
+                
+                // 设置状态更新
+                setupStatusUpdates();
+                
+                console.log('应用程序初始化完成');
+            }
+            
+            function loadUserData() {
+                // 模拟从本地存储加载用户数据
+                const savedUsername = localStorage.getItem('ftx_username') || 'FTX_User';
+                const savedEmail = localStorage.getItem('ftx_email') || 'user@example.com';
+                const savedLicense = localStorage.getItem('ftx_license_code') || '######';
+                
+                // 更新UI
+                document.getElementById('username').value = savedUsername;
+                document.getElementById('email').value = savedEmail;
+                licenseInput.value = savedLicense;
+                document.getElementById('license-display').value = savedLicense;
+                
+                // 更新用户状态
+                userStatus.textContent = savedUsername;
+                
+                console.log('用户数据加载完成:', { savedUsername, savedEmail, savedLicense });
+            }
+            
+            function setupNavigation() {
+                navItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // 更新活动导航项
+                        navItems.forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 获取目标部分
+                        const targetSection = this.getAttribute('data-section');
+                        
+                        // 更新内容部分
+                        contentSections.forEach(section => {
+                            section.classList.remove('active');
+                            if (section.id === `${targetSection}-section`) {
+                                section.classList.add('active');
+                            }
+                        });
+                        
+                        // 更新标题
+                        updateSectionTitle(this.textContent.trim());
+                        
+                        console.log('导航切换至:', targetSection);
+                    });
+                });
+            }
+            
+            function updateSectionTitle(title) {
+                currentSectionTitle.textContent = title;
+            }
+            
+            function setupDocumentation() {
+                docNavItems.forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // 更新活动文档导航项
+                        docNavItems.forEach(nav => nav.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 获取目标文档部分
+                        const targetDoc = this.getAttribute('data-doc');
+                        
+                        // 更新文档内容部分
+                        docSections.forEach(section => {
+                            section.classList.remove('active');
+                            if (section.id === targetDoc) {
+                                section.classList.add('active');
+                            }
+                        });
+                        
+                        console.log('文档导航切换至:', targetDoc);
+                    });
+                });
+            }
+            
+            function setupApiNavigation() {
+                apiEndpoints.forEach(endpoint => {
+                    endpoint.addEventListener('click', function() {
+                        // 更新活动API端点
+                        apiEndpoints.forEach(api => api.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // 获取目标API部分
+                        const targetApi = this.getAttribute('data-api');
+                        
+                        // 更新API详情部分
+                        apiDetailSections.forEach(section => {
+                            section.classList.remove('active');
+                            if (section.id === `${targetApi}-api`) {
+                                section.classList.add('active');
+                            }
+                        });
+                        
+                        console.log('API导航切换至:', targetApi);
+                    });
+                });
+            }
+            
+            function setupLicenseValidation() {
+                // 提交按钮点击事件
+                submitBtn.addEventListener('click', function() {
+                    console.log('提交按钮被点击');
+                    validateLicense();
+                });
+                
+                // 输入框回车事件
+                licenseInput.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        console.log('回车键被按下');
+                        validateLicense();
+                    }
+                });
+                
+                console.log('许可证验证功能已设置');
+            }
+            
+            function validateLicense() {
+                const licenseCode = licenseInput.value.trim();
+                console.log('验证许可证代码:', licenseCode);
+                
+                // 保存到本地存储
+                localStorage.setItem('ftx_license_code', licenseCode);
+                console.log('许可证代码已保存到本地存储');
+                
+                // 显示加载状态
+                btnText.textContent = '验证中...';
+                spinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+                console.log('显示加载状态');
+                
+                // 清除之前的消息
+                messageDiv.style.display = 'none';
+                messageDiv.className = 'message';
+                
+                // 模拟API调用延迟
+                console.log('开始验证过程...');
+                setTimeout(() => {
+                    // 验证许可证代码
+                    if (licenseCode === 'KSZQSG1') {
+                        console.log('许可证验证成功！');
+                        
+                        // 验证成功
+                        showMessage('许可证验证成功！正在跳转到工具页面...', 'success');
+                        licenseStatus.textContent = '已验证';
+                        licenseStatus.style.color = 'var(--success-color)';
+                        
+                        // 更新设置页面显示
+                        document.getElementById('license-display').value = licenseCode;
+                        
+                        // 延迟跳转以便用户看到成功消息
+                        setTimeout(() => {
+                            console.log('开始跳转到: https://yangshubao.online/Answer_KSZQSG1.html');
+                            // 跳转到指定的工具页面
+                            window.location.href = 'https://yangshubao.online/Answer_KSZQSG1.html';
+                        }, 1500);
+                    } else if (licenseCode === '') {
+                        // 空输入
+                        console.log('许可证代码为空');
+                        showMessage('请输入许可证代码。', 'error');
+                        resetButton();
+                    } else {
+                        // 验证失败
+                        console.log('许可证代码无效:', licenseCode);
+                        showMessage('许可证代码无效，请检查后重试。', 'error');
+                        licenseStatus.textContent = '未验证';
+                        licenseStatus.style.color = 'var(--error-color)';
+                        resetButton();
+                    }
+                }, 1000);
+            }
+            
+            function setupSettings() {
+                // 保存设置
+                saveSettingsBtn.addEventListener('click', function() {
+                    console.log('保存设置按钮被点击');
+                    saveSettings();
+                });
+                
+                // 重置设置
+                resetSettingsBtn.addEventListener('click', function() {
+                    console.log('重置设置按钮被点击');
+                    if (confirm('确定要重置所有设置为默认值吗？')) {
+                        resetSettings();
+                    }
+                });
+                
+                // 导出设置
+                exportSettingsBtn.addEventListener('click', function() {
+                    console.log('导出设置按钮被点击');
+                    exportSettings();
+                });
+                
+                // 导入设置
+                importSettingsBtn.addEventListener('click', function() {
+                    console.log('导入设置按钮被点击');
+                    // 模拟文件选择
+                    importSettings();
+                });
+                
+                console.log('设置功能已初始化');
+            }
+            
+            function saveSettings() {
+                // 收集所有设置值
+                const settings = {
+                    username: document.getElementById('username').value,
+                    email: document.getElementById('email').value,
+                    theme: document.getElementById('theme-select').value,
+                    font: document.getElementById('font-select').value,
+                    fontSize: document.getElementById('font-size').value,
+                    lineHeight: document.getElementById('line-height').value,
+                    autoSave: document.getElementById('auto-save').checked,
+                    autoUpdate: document.getElementById('auto-update').checked,
+                    errorReporting: document.getElementById('error-reporting').checked,
+                    usageStats: document.getElementById('usage-stats').checked,
+                    apiEndpoint: document.getElementById('api-endpoint').value,
+                    proxyServer: document.getElementById('proxy-server').value,
+                    timeout: document.getElementById('timeout').value,
+                    offlineMode: document.getElementById('offline-mode').checked
+                };
+                
+                // 保存到本地存储
+                localStorage.setItem('ftx_settings', JSON.stringify(settings));
+                localStorage.setItem('ftx_username', settings.username);
+                localStorage.setItem('ftx_email', settings.email);
+                
+                // 更新用户状态
+                userStatus.textContent = settings.username;
+                
+                // 显示成功消息
+                showSettingsMessage('设置已保存成功！', 'success');
+                
+                // 应用主题
+                if (settings.theme !== 'dark') {
+                    applyTheme(settings.theme);
+                }
+                
+                console.log('设置已保存:', settings);
+            }
+            
+            function resetSettings() {
+                // 重置所有设置控件为默认值
+                document.getElementById('username').value = 'FTX_User';
+                document.getElementById('email').value = 'user@example.com';
+                document.getElementById('theme-select').value = 'dark';
+                document.getElementById('font-select').value = 'Consolas';
+                document.getElementById('font-size').value = '14';
+                document.getElementById('line-height').value = '1.6';
+                document.getElementById('auto-save').checked = true;
+                document.getElementById('auto-update').checked = true;
+                document.getElementById('error-reporting').checked = true;
+                document.getElementById('usage-stats').checked = true;
+                document.getElementById('api-endpoint').value = 'https://github.com/ProgrammerLiSichen/FTX_Tools';
+                document.getElementById('proxy-server').value = '';
+                document.getElementById('timeout').value = '30';
+                document.getElementById('offline-mode').checked = false;
+                
+                // 清除本地存储的设置
+                localStorage.removeItem('ftx_settings');
+                
+                // 更新用户状态
+                userStatus.textContent = 'FTX_User';
+                
+                // 应用默认主题
+                applyTheme('dark');
+                
+                // 显示消息
+                showSettingsMessage('设置已重置为默认值。', 'success');
+                
+                console.log('设置已重置为默认值');
+            }
+            
+            function exportSettings() {
+                // 获取当前设置
+                const settings = {
+                    username: document.getElementById('username').value,
+                    email: document.getElementById('email').value,
+                    theme: document.getElementById('theme-select').value,
+                    font: document.getElementById('font-select').value,
+                    fontSize: document.getElementById('font-size').value,
+                    lineHeight: document.getElementById('line-height').value,
+                    autoSave: document.getElementById('auto-save').checked,
+                    autoUpdate: document.getElementById('auto-update').checked,
+                    errorReporting: document.getElementById('error-reporting').checked,
+                    usageStats: document.getElementById('usage-stats').checked,
+                    apiEndpoint: document.getElementById('api-endpoint').value,
+                    proxyServer: document.getElementById('proxy-server').value,
+                    timeout: document.getElementById('timeout').value,
+                    offlineMode: document.getElementById('offline-mode').checked,
+                    exportedAt: new Date().toISOString()
+                };
+                
+                // 创建下载链接
+                const dataStr = JSON.stringify(settings, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                // 创建下载链接并触发点击
+                const exportFileDefaultName = 'ftx-settings.json';
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                // 显示消息
+                showSettingsMessage('设置已导出为 JSON 文件。', 'success');
+                
+                console.log('设置已导出:', settings);
+            }
+            
+            function importSettings() {
+                // 模拟文件选择和导入
+                // 在实际应用中，这里会使用文件输入元素
+    
+                // 模拟导入成功
+                showSettingsMessage('设置导入功能需要文件选择。请在实际应用中实现文件上传。', 'warning');
+                
+                console.log('导入设置功能被调用');
+            }
+            
+            function applyTheme(theme) {
+                // 在实际应用中，这里会切换CSS主题
+                // 这里只是模拟，实际实现需要定义不同的CSS变量集合
+                
+                // 显示消息
+                showSettingsMessage(`已应用${theme === 'dark' ? '深色' : theme === 'light' ? '浅色' : theme === 'blue' ? '蓝色' : '高对比度'}主题`, 'success');
+                
+                console.log('应用主题:', theme);
+            }
+            
+            function setupStatusUpdates() {
+                // 模拟存储使用情况更新
+                updateStorageStatus();
+                
+                // 模拟连接状态更新
+                updateConnectionStatus();
+                
+                // 定期更新状态
+                setInterval(updateStorageStatus, 30000);
+                setInterval(updateConnectionStatus, 15000);
+                
+                console.log('状态更新功能已设置');
+            }
+            
+            function updateStorageStatus() {
+                // 模拟存储使用情况
+                const used = (1.2 + Math.random() * 0.1).toFixed(1);
+                const total = 5.0;
+                storageStatus.textContent = `${used} GB / ${total} GB`;
+                
+                // 根据使用情况改变颜色
+                const percentage = (used / total) * 100;
+                if (percentage > 90) {
+                    storageStatus.style.color = 'var(--error-color)';
+                } else if (percentage > 75) {
+                    storageStatus.style.color = 'var(--warning-color)';
+                } else {
+                    storageStatus.style.color = 'var(--success-color)';
+                }
+                
+                console.log('存储状态更新:', `${used} GB / ${total} GB`);
+            }
+            
+            function updateConnectionStatus() {
+                // 模拟连接状态变化
+                const statuses = ['状态安全', '不完全权限', '权限不稳定'];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                
+                // 更新显示
+                connectionStatus.textContent = randomStatus;
+                
+                // 根据状态改变颜色
+                if (randomStatus === '状态安全') {
+                    connectionStatus.style.color = 'var(--success-color)';
+                } else if (randomStatus === '不完全权限') {
+                    connectionStatus.style.color = 'var(--warning-color)';
+                } else {
+                    connectionStatus.style.color = 'var(--error-color)';
+                }
+                
+                console.log('连接状态更新:', randomStatus);
+            }
+            
+            function showMessage(text, type) {
+                messageDiv.textContent = text;
+                messageDiv.className = `message ${type}`;
+                messageDiv.style.display = 'block';
+                
+                // 滚动到消息位置
+                messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                console.log('显示消息:', text, '类型:', type);
+            }
+            
+            function showSettingsMessage(text, type) {
+                settingsMessage.textContent = text;
+                settingsMessage.className = `message ${type}`;
+                settingsMessage.style.display = 'block';
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    settingsMessage.style.display = 'none';
+                }, 3000);
+                
+                console.log('显示设置消息:', text, '类型:', type);
+            }
+            
+            function resetButton() {
+                btnText.textContent = '验证许可证';
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+                
+                console.log('按钮状态已重置');
+            }
+            
+            // 初始聚焦到输入框
+            licenseInput.focus();
+            console.log('输入框已聚焦');
+        });
+    </script>
+</body>
 </html>
